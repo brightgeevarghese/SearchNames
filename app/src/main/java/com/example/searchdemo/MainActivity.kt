@@ -1,5 +1,6 @@
 package com.example.searchdemo
 
+import android.R.attr.text
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -51,27 +54,35 @@ fun SearchNames(
         "Tom", "Jerry", "Mickey", "Donald", "Daisy", "Huey", "Dewey", "Louie", "Goofy", "Pluto", "Minnie", "Vinnie", "Roadhog", "Piggy", "Mona", "Frozen"
     ) }
     var expanded by remember { mutableStateOf(false) }
-    var query by remember { mutableStateOf("") }
-    val filteredNames = names.filter { it.contains(query, ignoreCase = true) }
+    var text by remember { mutableStateOf("") }
+    val filteredNames = names.filter { it.contains(text, ignoreCase = true) }
     Scaffold(
         modifier = modifier,
         topBar = {
             DockedSearchBar(
                 inputField = {
                     SearchBarDefaults.InputField(
-                        query = query, //The text currently typed in the search box
-                        onQueryChange = { input -> query = input },//{query = it} // A function that runs whenever the user types something — updates query state.
-                        onSearch = { expanded = false },//After pressing the search key, the search bar collapses (results area closes).
+                        query = text, //The current text shown inside the search box
+                        // Callback whenever the user types something.
+                        // Updates the state variable `text` with the new input.
+                        onQueryChange = { text = it },
+                        // Callback when the user presses the search key (IME action).
+                        // Collapses the search bar by setting `expanded` to false.
+                        onSearch = { expanded = false },
                         expanded = expanded,
-                        onExpandedChange = { status -> expanded = !status },
-                        placeholder = { Text(text = "Search") }
+                        // Callback whenever the expanded state changes (user taps, focuses, etc.)
+                        onExpandedChange = { expanded = it },
+                        placeholder = { Text("Hinted search text") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
                     )
                 },
+                // Controls whether the result area below the search bar is visible.
                 expanded = expanded,//if it is true, it shows expanded
                 onExpandedChange = { expanded = it },
             ) {
                 Text(
-                    text = "Results for: $query",
+                    text = "Results for: $text",
                 )
             }
         },
